@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+  <title>Temperature Converter</title>
+</head>
+
+<body>
+
+ <div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="card shadow">
+        <div class="card-body">
+          <h2 class="card-title text-center mb-4">Temperature Converter</h2>
+          
+          <!-- Conversion direction -->
+          <div class="mb-3">
+            <label class="form-label">Conversion Type</label>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="conversionType" id="celsiusToFahrenheit" value="celsiusToFahrenheit" checked>
+              <label class="form-check-label" for="celsiusToFahrenheit">
+                Celsius to Fahrenheit
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="conversionType" id="fahrenheitToCelsius" value="fahrenheitToCelsius">
+              <label class="form-check-label" for="fahrenheitToCelsius">
+                Fahrenheit to Celsius
+              </label>
+            </div>
+          </div>
+          
+          <!-- Temperature input -->
+          <div class="mb-3">
+            <label for="tempInput" class="form-label">Enter Temperature</label>
+            <input type="number" class="form-control" id="tempInput" placeholder="e.g., 20">
+          </div>
+          
+          <!-- Convert button -->
+          <button class="btn btn-primary w-100 mb-3" id="convertBtn">Convert</button>
+          
+          <!-- Result -->
+          <div id="result" class="alert alert-info text-center" style="display: none;">
+            <strong id="resultText"></strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script> 
+const tempInput = document.getElementById('tempInput');
+const convertBtn = document.getElementById('convertBtn');
+const result = document.getElementById('result');
+const resultText = document.getElementById('resultText');
+
+convertBtn.addEventListener('click', function() {
+  // Get input value
+  const temp = parseFloat(tempInput.value);
+  
+  // Validate input
+  if (isNaN(temp)) {
+    resultText.textContent = 'Please enter a valid number.';
+    result.style.display = 'block';
+    return;
+  }
+  
+  // Get selected conversion type
+  const conversionType = document.querySelector('input[name="conversionType"]:checked').value;
+  
+  let convertedTemp;
+  let unit;
+  
+  // Perform conversion
+  if (conversionType === 'celsiusToFahrenheit') {
+    convertedTemp = (temp * 9/5) + 32;
+    unit = '°F';
+  } else {
+    convertedTemp = (temp - 32) * 5/9;
+    unit = '°C';
+  }
+  
+  // Display result
+  resultText.textContent = `${temp}° = ${convertedTemp.toFixed(1)}${unit}`;
+  result.style.display = 'block';
+});
+
+// Allow Enter key to convert
+tempInput.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    convertBtn.click();
+  }
+});
+ </script>
+
+
+

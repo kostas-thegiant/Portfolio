@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BMI Calculator</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <style>
+    :root { --card-w: min(600px, 92vw); }
+    body { background: #f7fafc; }
+    .bmi-card { width: var(--card-w); margin: 6rem auto; }
+    .bmi-result { font-size: 1.125rem; }
+  </style>
+</head>
+<body>
+  <main class="bmi-card card shadow-sm">
+    <div class="card-body">
+      <h1 class="h3 mb-3">BMI calculator</h1>
+<form id="bmi-form" class="row g-3" novalidate>
+  <!-- Unit toggle -->
+  <div class="col-12">
+    <label class="form-label d-block">Units</label>
+    <div class="btn-group" role="group" aria-label="Units">
+      <input type="radio" class="btn-check" name="units" id="uMetric" autocomplete="off" checked>
+      <label class="btn btn-outline-primary" for="uMetric">Metric (kg, cm)</label>
+      <input type="radio" class="btn-check" name="units" id="uImperial" autocomplete="off">
+      <label class="btn btn-outline-primary" for="uImperial">Imperial (lb, ft/in)</label>
+    </div>
+  </div>
+
+  <!-- Metric fields -->
+  <div id="metricFields" class="col-12">
+    <div class="row g-3">
+      <div class="col-sm-6">
+        <label for="weightKg" class="form-label">Weight (kg)</label>
+        <input id="weightKg" type="number" min="1" step="0.1" class="form-control" required>
+      </div>
+      <div class="col-sm-6">
+        <label for="heightCm" class="form-label">Height (cm)</label>
+        <input id="heightCm" type="number" min="50" step="0.1" class="form-control" required>
+      </div>
+    </div>
+  </div>
+
+  <!-- Imperial fields -->
+  <div id="imperialFields" class="col-12 d-none">
+    <div class="row g-3">
+      <div class="col-sm-4">
+        <label for="weightLb" class="form-label">Weight (lb)</label>
+        <input id="weightLb" type="number" min="1" step="0.1" class="form-control">
+      </div>
+      <div class="col-sm-4">
+        <label for="heightFt" class="form-label">Height (ft)</label>
+        <input id="heightFt" type="number" min="1" step="1" class="form-control">
+      </div>
+      <div class="col-sm-4">
+        <label for="heightIn" class="form-label">Height (in)</label>
+        <input id="heightIn" type="number" min="0" step="0.1" class="form-control">
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Calculate</button>
+    <button type="button" id="clear" class="btn btn-outline-secondary">Clear</button>
+  </div>
+</form>
+
+
+      <hr class="my-4">
+      <div id="output" class="bmi-result" aria-live="polite"></div>
+      <p class="text-muted small mt-3">
+        BMI is a screening measure and not a diagnosis. Categories shown are for adults 20+. [Source: CDC/NIDDK] 
+      </p>
+    </div>
+  </main>
+
+  <script>
+    const $ = (s, root = document) => root.querySelector(s);
+
+    function categorize(bmi) {
+      if (bmi < 18.5) return "Underweight";
+      if (bmi < 25)   return "Healthy weight";
+      if (bmi < 30)   return "Overweight";
+      return "Obesity";
+    }
+
+    function formatBMI(bmi) {
+      return Number.isFinite(bmi) ? bmi.toFixed(1) : "";
+    }
+    // Toggle visibility of input groups
+const metricFields = document.getElementById("metricFields");
+const imperialFields = document.getElementById("imperialFields");
+document.getElementById("uMetric").addEventListener("change", () => {
+  metricFields.classList.remove("d-none");
+  imperialFields.classList.add("d-none");
+});
+document.getElementById("uImperial").addEventListener("change", () => {
+  metricFields.classList.add("d-none");
+  imperialFields.classList.remove("d-none");
+});
+
+function computeBMI() {
+  const useMetric = document.getElementById("uMetric").checked;
+
+  if (useMetric) {
+    const kg = parseFloat(document.getElementById("weightKg").value);
+    const cm = parseFloat(document.getElementById("heightCm").value);
+    if (!kg || !cm || kg <= 0 || cm <= 0) return null;
+    const m = cm / 100;
+    return kg / (m * m); // metric BMI
+  } else {
+    const lb = parseFloat(document.getElementById("weightLb").value);
+    const ft = parseFloat(document.getElementById("heightFt").value);
+    const inch = parseFloat(document.getElementById("heightIn").value) || 0;
+    if (!lb || !ft || lb <= 0 || ft <= 0) return null;
+    const totalIn = ft * 12 + inch;
+    return (lb / (totalIn * totalIn)) * 703; // imperial BMI 
+  }
+}
+
+document.getElementById("bmi-form").addEventListener("submit", (e) => {
+  e.preventDefault(); // single‑page behavior  
+  const bmi = computeBMI();
+  const out = document.getElementById("output");
+  if (!Number.isFinite(bmi)) {
+    out.textContent = "Please enter valid values in the selected units.";
+    return;
+  }
+  out.textContent = `BMI: ${formatBMI(bmi)} — ${categorize(bmi)}`;
+});
+
+document.getElementById("clear").addEventListener("click", () => {
+  ["weightKg","heightCm","weightLb","heightFt","heightIn"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+  document.getElementById("output").textContent = "";
+  // put focus on the visible first field
+  (document.getElementById("uMetric").checked ? document.getElementById("weightKg") : document.getElementById("weightLb")).focus();
+});
+</script>
+</body>
+</html>
