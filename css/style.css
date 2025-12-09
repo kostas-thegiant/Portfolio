@@ -53,5 +53,9 @@ h1{
 .card-body .d-flex.gap-2 {
     margin-top: auto;
 }
+.card-img-top {
+  height: 220px;          /* same visual height for all previews */
+  object-fit: cover;      /* crop excess but keep aspect ratio */
+}
 
 
